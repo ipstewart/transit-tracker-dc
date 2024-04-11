@@ -1,3 +1,5 @@
+import { Moment } from 'moment';
+
 export interface BusStopResponse {
   Stops: {
     Lat: number;
@@ -72,6 +74,7 @@ export interface BusRoutePrediction {
   directionText: string;
   routeId: string;
   predictions: RoutePrediction[];
+  lastUpdated: Moment;
 }
 
 export interface BusPathDirection {

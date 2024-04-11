@@ -1,11 +1,13 @@
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Slide from '@mui/material/Slide';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { getBusPathDetails } from '../../../api/api';
 import { BusPathDetails, BusRoutePrediction, BusStop } from '../../../models/bus.model';
@@ -13,33 +15,48 @@ import { BusPathDetails, BusRoutePrediction, BusStop } from '../../../models/bus
 interface BusResultDetailsProps {
   stop: BusStop;
   busPredictions: BusRoutePrediction[];
+  getBusPredictions: (stopId: string) => Promise<void>;
 }
 
-function BusResultDetails({ stop, busPredictions }: Readonly<BusResultDetailsProps>) {
-  const [showRoutes, setShowRoutes] = useState<
-    { stopId: string; routeId: string; routeName: string; routeDirection: string }[]
-  >([]);
-  const [routeInfo, setRouteInfo] = useState<Record<string, BusPathDetails>>({});
+function BusResultDetails({
+  stop,
+  busPredictions,
+  getBusPredictions,
+}: Readonly<BusResultDetailsProps>) {
+  const [route, setRoute] = useState<{
+    stopId: string;
+    routeId: string;
+    routeName: string;
+    routeDirection: string;
+  } | null>(null);
+  const [routeDetails, setRouteDetails] = useState<Record<string, BusPathDetails>>({});
+  const [accordionHeight, setAccordionHeight] = useState(0);
+
+  const scheduleRef = useRef<HTMLDivElement>(null);
+  const routeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    showRoutes.forEach((route) => {
-      if (!routeInfo.hasOwnProperty(route.routeId)) {
-        getBusPathDetails(route.routeId).then((path) => {
-          if (path) {
-            setRouteInfo({ ...routeInfo, [route.stopId]: path });
-          }
-        });
-      }
-    });
-  }, [showRoutes]);
+    if (route && !routeDetails.hasOwnProperty(route.routeId)) {
+      getBusPathDetails(route.routeId).then((path) => {
+        if (path) {
+          setRouteDetails({ ...routeDetails, [route.stopId]: path });
+        }
+      });
+    }
+  }, [route]);
+
+  useEffect(() => {
+    setAccordionHeight(
+      (route ? routeRef.current?.clientHeight : scheduleRef.current?.clientHeight) ?? 0,
+    );
+  }, [route, routeDetails]);
 
   const renderRoute = (stopId: string) => {
-    const route = routeInfo[stopId];
-    const routeDetails = showRoutes.find((details) => details.stopId === stopId);
+    const displayRouteDetails = routeDetails[stopId];
 
     const routeTemplate = (stopId: string, name: string) => (
-      <Box key={stopId} display="flex" alignItems="center" gap={1}>
-        <Box height="2px" width="10px" bgcolor="primary.main" ml="-25px" />
+      <Box key={stopId} className="flex items-center" gap={1}>
+        <Box className="h-[2px] w-[10px]" bgcolor="primary.main" />
         <Typography
           variant="h6"
           fontWeight={stopId === stop.stopId ? 600 : 300}
@@ -51,12 +68,12 @@ function BusResultDetails({ stop, busPredictions }: Readonly<BusResultDetailsPro
       </Box>
     );
 
-    if (route && routeDetails) {
+    if (route && displayRouteDetails) {
       // Get correct route direction
-      if (routeDetails.routeDirection === '1') {
+      if (route.routeDirection === '1') {
         return (
           <>
-            {route.direction1?.stops.map((routeStop) =>
+            {displayRouteDetails.direction1?.stops.map((routeStop) =>
               routeTemplate(routeStop.stopId, routeStop.name),
             )}
           </>
@@ -64,7 +81,7 @@ function BusResultDetails({ stop, busPredictions }: Readonly<BusResultDetailsPro
       } else {
         return (
           <>
-            {route.direction0?.stops.map((routeStop) =>
+            {displayRouteDetails.direction0?.stops.map((routeStop) =>
               routeTemplate(routeStop.stopId, routeStop.name),
             )}
           </>
@@ -74,19 +91,15 @@ function BusResultDetails({ stop, busPredictions }: Readonly<BusResultDetailsPro
   };
 
   return (
-    <Box overflow="hidden" width="100%" display="flex">
-      <Slide
-        direction="right"
-        in={!showRoutes.map((route) => route.stopId).includes(stop.stopId)}
-        // {...(!showRoutes.map((route) => route.stopId).includes(stop.stopId)
-        //   ? { timeout: 3000 }
-        //   : {})}
-        mountOnEnter
-        unmountOnExit>
+    <Box width="100%" height={accordionHeight} overflow="hidden" display="grid" position="relative">
+      <Box
+        className={`w-full absolute top-0 ${route ? '-left-full' : 'left-0'}`}
+        sx={{ transition: 'left 0.3s' }}
+        ref={scheduleRef}>
         <Box key={stop.stopId} width="100%">
-          {busPredictions.map((route, index) => (
+          {busPredictions.map((busRoute, index) => (
             <Box
-              key={stop.stopId + route.routeId}
+              key={stop.stopId + busRoute.routeId}
               display="flex"
               flexDirection="column"
               gap={1}
@@ -99,7 +112,7 @@ function BusResultDetails({ stop, busPredictions }: Readonly<BusResultDetailsPro
                     borderLeft="3px solid #002F6C">
                     <DirectionsBusIcon sx={{ fontSize: '14px' }} />
                     <Typography variant="body2" lineHeight="14px">
-                      {route.routeId}
+                      {busRoute.routeId}
                     </Typography>
                   </Box>
                   <Typography
@@ -107,7 +120,7 @@ function BusResultDetails({ stop, busPredictions }: Readonly<BusResultDetailsPro
                     overflow="hidden"
                     whiteSpace="nowrap"
                     textOverflow="ellipsis">
-                    {route.directionText}
+                    {busRoute.directionText}
                   </Typography>
                   <Typography
                     variant="body1"
@@ -115,31 +128,35 @@ function BusResultDetails({ stop, busPredictions }: Readonly<BusResultDetailsPro
                     bgcolor="info.main"
                     lineHeight="14px"
                     p="2px">
-                    LIVE
+                    LIVE {busRoute.lastUpdated.format('hh:mm:ss')}
                   </Typography>
+                  <IconButton
+                    aria-label="refresh"
+                    size="small"
+                    color="info"
+                    onClick={() => getBusPredictions(stop.stopId)}>
+                    <RefreshIcon fontSize="inherit" />
+                  </IconButton>
                 </Box>
-                {!showRoutes.map((route) => route.stopId).includes(stop.stopId) && (
+                {!route && (
                   <Button
                     endIcon={<ArrowForwardIosIcon />}
                     sx={{ color: 'primary.light' }}
                     onClick={() =>
-                      setShowRoutes([
-                        ...showRoutes,
-                        {
-                          stopId: stop.stopId,
-                          routeId: route.routeId,
-                          routeName: route.directionText,
-                          routeDirection: route.directionNum,
-                        },
-                      ])
+                      setRoute({
+                        stopId: stop.stopId,
+                        routeId: busRoute.routeId,
+                        routeName: busRoute.directionText,
+                        routeDirection: busRoute.directionNum,
+                      })
                     }>
                     ROUTE
                   </Button>
                 )}
               </Box>
-              <Box width="200px" maxWidth="100%" height="1px" bgcolor="primary.light" />
-              <Box width="200px" maxWidth="100%">
-                {route.predictions.map((prediction) => (
+              <Box className="w-[200px] h-[1px]" bgcolor="primary.light" />
+              <Box className="w-[200px] max-w-full">
+                {busRoute.predictions.map((prediction) => (
                   <Box key={prediction.tripId} display="flex" justifyContent="space-between">
                     <Typography variant="body1">
                       {prediction.minutes === 0 ? 'ARRIVING' : `${prediction.minutes} minutes`}
@@ -153,22 +170,21 @@ function BusResultDetails({ stop, busPredictions }: Readonly<BusResultDetailsPro
             </Box>
           ))}
         </Box>
-      </Slide>
-      <Slide
-        direction="left"
-        in={showRoutes.map((route) => route.stopId).includes(stop.stopId)}
-        mountOnEnter
-        unmountOnExit>
-        <Box width="100%" display="flex" flexDirection="column" gap={1}>
-          <Box display="flex" justifyContent="space-between" gap={1}>
-            <Box display="flex" alignItems="center" gap={1} minWidth="0">
+      </Box>
+      <Box
+        className={`w-full absolute top-0 ${route ? 'left-0' : 'left-full'}`}
+        sx={{ transition: 'left 0.3s' }}
+        ref={routeRef}>
+        <Box className="w-full flex flex-col" gap={1}>
+          <Box className="flex justify-between" gap={1}>
+            <Box className="flex items-center min-w-0" gap={1}>
               <Box
                 className="flex gap-[2px] items-center px-[3px] py-[2px]"
                 border="1px solid #454545"
                 borderLeft="3px solid #002F6C">
                 <DirectionsBusIcon sx={{ fontSize: '14px' }} />
                 <Typography variant="body2" lineHeight="14px">
-                  {showRoutes.find((route) => route.stopId === stop.stopId)?.routeId}
+                  {route?.routeId}
                 </Typography>
               </Box>
               <Typography
@@ -176,34 +192,26 @@ function BusResultDetails({ stop, busPredictions }: Readonly<BusResultDetailsPro
                 overflow="hidden"
                 whiteSpace="nowrap"
                 textOverflow="ellipsis">
-                {showRoutes.find((route) => route.stopId === stop.stopId)?.routeName}
+                {route?.routeName}
               </Typography>
             </Box>
             <Button
-              endIcon={<ArrowForwardIosIcon />}
+              startIcon={<ArrowBackIosIcon />}
               sx={{ color: 'primary.light' }}
-              onClick={() =>
-                setShowRoutes(showRoutes.filter((shownRoute) => shownRoute.stopId !== stop.stopId))
-              }>
-              ROUTE
+              onClick={() => setRoute(null)}>
+              SCHEDULE
             </Button>
           </Box>
-          <Box width="200px" height="1px" bgcolor="primary.light" />
-
-          <Box className="flex" alignItems="center" gap={2} ml={1}>
-            <Box
-              height="calc(100% - 30px)"
-              display="flex"
-              flexDirection="column"
-              alignItems="center">
-              <Box height="2px" width="20px" bgcolor="primary.main" />
-              <Box flex="1" width="2px" bgcolor="primary.main" />
-              <Box height="2px" width="20px" bgcolor="primary.main" />
-            </Box>
-            <Box>{renderRoute(stop.stopId)}</Box>
+          <Box className="w-[200px] h-[1px]" bgcolor="primary.light" />
+          <Box
+            className="flex items-center"
+            gap={2}
+            borderLeft="2px solid"
+            borderColor="primary.main">
+            <Box className="w-full">{renderRoute(stop.stopId)}</Box>
           </Box>
         </Box>
-      </Slide>
+      </Box>
     </Box>
   );
 }

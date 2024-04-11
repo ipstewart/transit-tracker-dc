@@ -3,6 +3,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 
 import { getBusPredictionAtStop } from '../../api/api';
@@ -23,7 +24,9 @@ function BusResults({ location, stops }: Readonly<BusResultsProps>) {
   const getBusPredictions = async (stopId: string) => {
     setExpanded(
       expanded.map((e) =>
-        e.stopId === stopId ? { stopId, expanded: !e.expanded } : { stopId, expanded: e.expanded },
+        e.stopId === stopId
+          ? { stopId: e.stopId, expanded: !e.expanded }
+          : { stopId: e.stopId, expanded: e.expanded },
       ),
     );
 
@@ -53,6 +56,7 @@ function BusResults({ location, stops }: Readonly<BusResultsProps>) {
             directionText: predictionsInRoute[0].directionText,
             routeId: predictionsInRoute[0].routeId,
             predictions: stopPredictions,
+            lastUpdated: moment(),
           });
         });
         setBusPredictions((prevPredictions) => ({
@@ -93,7 +97,11 @@ function BusResults({ location, stops }: Readonly<BusResultsProps>) {
             </AccordionSummary>
             <AccordionDetails sx={{ py: 2, px: 3 }}>
               {busPredictions[stop.stopId] ? (
-                <BusResultDetails stop={stop} busPredictions={busPredictions[stop.stopId]} />
+                <BusResultDetails
+                  stop={stop}
+                  busPredictions={busPredictions[stop.stopId]}
+                  getBusPredictions={getBusPredictions}
+                />
               ) : (
                 <Typography variant="h6">No predictions available</Typography>
               )}

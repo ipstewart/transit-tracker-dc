@@ -3,6 +3,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 
 import { getMetroPredictionAtStation, getMetroStation } from '../../api/api';
@@ -102,6 +103,8 @@ function MetroResults({ location, metroEntrances }: Readonly<MetroResultsInterfa
                     metroPredictionsStation2={
                       station.stationTogether1 ? metroPredictions[station.stationTogether1] : []
                     }
+                    lastUpdated={moment()}
+                    getMetroPredictions={getMetroPredictions}
                   />
                 ) : (
                   <Typography variant="h6">No predictions available</Typography>
@@ -109,6 +112,11 @@ function MetroResults({ location, metroEntrances }: Readonly<MetroResultsInterfa
               </AccordionDetails>
             </Accordion>
           ))}
+      {metroStations.length === 0 && (
+        <Typography variant="h6" fontWeight="300" textAlign="center" m={2}>
+          No nearby metro stations. Choose a different address to see transit options.
+        </Typography>
+      )}
     </Box>
   );
 }

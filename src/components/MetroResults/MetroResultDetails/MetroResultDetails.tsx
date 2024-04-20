@@ -1,7 +1,9 @@
 import PeopleIcon from '@mui/icons-material/People';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 import { MetroPrediction } from '../../../models/metro.model';
 import { getMetroColor } from '../../../utils/utils';
@@ -9,14 +11,40 @@ import { getMetroColor } from '../../../utils/utils';
 interface MetroResultDetailsProps {
   metroPredictions: MetroPrediction[];
   metroPredictionsStation2: MetroPrediction[];
+  lastUpdated: Moment;
+  getMetroPredictions: (stationCodes: string[]) => Promise<void>;
 }
 
 function MetroResultDetails({
   metroPredictions,
   metroPredictionsStation2,
+  lastUpdated,
+  getMetroPredictions,
 }: Readonly<MetroResultDetailsProps>) {
   return (
     <>
+      <Box className="flex items-center gap-2 mb-2">
+        <Typography
+          variant="body1"
+          color="info.contrastText"
+          bgcolor="info.main"
+          lineHeight="14px"
+          p="2px">
+          LIVE {lastUpdated.format('hh:mm:ss')}
+        </Typography>
+        <IconButton
+          aria-label="refresh"
+          size="small"
+          color="info"
+          onClick={() =>
+            getMetroPredictions([
+              ...metroPredictions.map((prediction) => prediction.locationCode),
+              ...metroPredictionsStation2.map((prediction) => prediction.locationCode),
+            ])
+          }>
+          <RefreshIcon fontSize="inherit" />
+        </IconButton>
+      </Box>
       {metroPredictions
         .concat(metroPredictionsStation2)
         .sort((a, b) => {

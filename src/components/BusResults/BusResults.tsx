@@ -100,6 +100,11 @@ function BusResults({ location, stops }: Readonly<BusResultsProps>) {
             </AccordionDetails>
           </Accordion>
         ))}
+      {stops.length === 0 && (
+        <Typography variant="h6" fontWeight="300" textAlign="center" m={2}>
+          No nearby bus stops. Choose a different address to see transit options.
+        </Typography>
+      )}
     </Box>
   );
 }

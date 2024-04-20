@@ -1,4 +1,5 @@
 import { Loader, LoaderOptions } from '@googlemaps/js-api-loader';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -10,22 +11,51 @@ import { SearchLocation } from '../models/location.model';
 const apiKey: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 interface SearchProps {
-  locationLabel: string | undefined;
-  locationId: string | undefined;
+  location: string | undefined;
   setSearchCoords: (coords: SearchLocation | null) => void;
 }
 
-function Search({ locationLabel, locationId, setSearchCoords }: Readonly<SearchProps>) {
-  const [selectedLocation, setSelectedLocation] = useState<{ id: string; label: string } | null>(
-    null,
-  );
+function Search({ location, setSearchCoords }: Readonly<SearchProps>) {
   const navigate = useNavigate();
+
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
   const autocomplete = useRef<google.maps.places.AutocompleteService | null>(null);
   const geocoder = useRef<google.maps.Geocoder | null>(null);
 
-  const [addressOptions, setAddressOptions] = useState<{ id: string; label: string }[]>([]);
+  const [addressOptions, setAddressOptions] = useState<string[]>([]);
   const [currentLocation, setCurrentLocation] = useState<SearchLocation | null>();
+
+  const CURRENT_LOCATION = 'Current Location';
+
+  useEffect(() => {
+    const getCurrentLocation = (): Promise<SearchLocation | null> => {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error('Geolocation is not supported by your browser'));
+        } else {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              resolve({
+                name: CURRENT_LOCATION,
+                lat: position.coords.latitude,
+                lon: position.coords.longitude,
+              });
+            },
+            (error) => {
+              if (error.code === error.PERMISSION_DENIED) {
+                resolve(null); // User denied the request for Geolocation
+              } else {
+                reject(error); // Other errors
+              }
+            },
+          );
+        }
+      });
+    };
+
+    getCurrentLocation().then((currentLocation) => setCurrentLocation(currentLocation));
+  }, []);
 
   useEffect(() => {
     const loadMapApi = () => {
@@ -40,95 +70,77 @@ function Search({ locationLabel, locationId, setSearchCoords }: Readonly<SearchP
       });
     };
 
-    const searchAddress = (locationLabel: string, locationId: string) => {
-      geocoder.current?.geocode({ placeId: locationId }, (results, status) => {
-        if (status === google.maps.GeocoderStatus.OK && results && results.length > 0) {
-          const locationResults = results[0].geometry?.location;
-
-          if (location) {
+    const searchAddress = (address: string | undefined) => {
+      if (!address) {
+        setAddressOptions(currentLocation ? [CURRENT_LOCATION] : []);
+      } else if (address === CURRENT_LOCATION && currentLocation) {
+        setSearchCoords(currentLocation);
+        setSelectedLocation(address);
+        navigate(`/${encodeURIComponent(address)}`);
+      } else {
+        geocoder.current?.geocode({ address }, (results, status) => {
+          if (status === google.maps.GeocoderStatus.OK && results && results.length > 0) {
+            const location = results[0].geometry?.location;
             setSearchCoords({
-              name: locationLabel,
-              lat: locationResults.lat(),
-              lon: locationResults.lng(),
+              name: address,
+              lat: location.lat(),
+              lon: location.lng(),
             });
-            setSelectedLocation({ id: locationId, label: locationLabel });
+            setSelectedLocation(address);
           }
-        }
-      });
+        });
+      }
     };
-
-    if (!locationLabel || !locationId) {
-      loadMapApi();
-      return;
-    }
 
     // If this is the first load, initialize the map API
     if (!geocoder.current) {
-      loadMapApi().then(() => searchAddress(locationLabel, locationId));
+      loadMapApi().then(() => searchAddress(location));
     } else {
-      searchAddress(locationLabel, locationId);
+      searchAddress(location);
     }
-  }, [locationLabel, locationId, setSearchCoords]);
-
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCurrentLocation({
-            name: 'Your Location',
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.error('Error getting user location:', error);
-        },
-      );
-    } else {
-      console.error('Geolocation is not supported by this browser.');
-    }
-  };
+  }, [location, currentLocation, navigate, setSearchCoords]);
 
   const handleInputChange = (searchAddress: string) => {
+    if (searchAddress === CURRENT_LOCATION) {
+      setAddressOptions([]);
+      return;
+    }
+    if (!searchAddress) {
+      setAddressOptions([CURRENT_LOCATION]);
+      return;
+    }
     autocomplete.current?.getPlacePredictions({ input: searchAddress }, (predictions, status) => {
       if (
         status === google.maps.places.PlacesServiceStatus.OK &&
         predictions &&
         predictions.length > 0
       ) {
-        const predictionList = predictions.map((prediction) => ({
-          id: prediction.place_id,
-          label: prediction.description,
-        }));
-        setAddressOptions(
-          selectedLocation &&
-            !predictionList.map((prediction) => prediction.id).includes(selectedLocation.id)
-            ? [...predictionList, selectedLocation]
-            : predictionList,
-        );
+        const predictionList = predictions.map((prediction) => prediction.description);
+        setAddressOptions(predictionList);
       }
     });
   };
 
-  const handleSelectLocation = (selection: { id: string; label: string } | null) => {
+  const handleSelectLocation = (selection: string | null) => {
     if (!selection) {
       setSearchCoords(null);
-      setAddressOptions([]);
+      setAddressOptions(currentLocation ? [CURRENT_LOCATION] : []);
       setSelectedLocation(null);
       navigate('/');
       return;
     }
-    if (selection.id === 'Current Location' && currentLocation) {
+    if (selection === CURRENT_LOCATION && currentLocation) {
       setSearchCoords(currentLocation);
+      setSelectedLocation(selection);
+      navigate(`/${encodeURIComponent(selection)}`);
     } else {
-      geocoder.current = new google.maps.Geocoder();
-      geocoder.current?.geocode({ placeId: selection.id }, (results, status) => {
+      geocoder.current?.geocode({ address: selection }, (results, status) => {
         if (status === google.maps.GeocoderStatus.OK && results && results.length > 0) {
           const location = results[0].geometry?.location;
           if (location) {
-            setSearchCoords({ name: selection.label, lat: location.lat(), lon: location.lng() });
-            setSelectedLocation({ label: selection.label, id: selection.label });
-            navigate(`/${encodeURIComponent(selection.label)}/${selection.id}`);
+            setSearchCoords({ name: selection, lat: location.lat(), lon: location.lng() });
+            setSelectedLocation(selection);
+            navigate(`/${encodeURIComponent(selection)}`);
           }
         }
       });
@@ -139,40 +151,30 @@ function Search({ locationLabel, locationId, setSearchCoords }: Readonly<SearchP
     <Box py={2}>
       <Autocomplete
         disablePortal
+        freeSolo
+        clearOnBlur
+        selectOnFocus
         options={addressOptions}
         value={selectedLocation}
         noOptionsText="Search for a location"
-        isOptionEqualToValue={(option, value) => option.id === value.id}
         onChange={(_e, value) => handleSelectLocation(value)}
-        onInputChange={(e, value) => handleInputChange(value)}
-        renderInput={(params) => <TextField {...params} label="Location" />}
-      />
-      {/* <Autocomplete
-        ref={autocompleteRef}
-        onChange={(_e, value) => (value ? handleSelectLocation(value.id, value.label) : null)}
-        options={[] as { id: string; label: string }[]}
-        getOptionLabel={(option) => option.label}
-        onInputChange={(_e, value) => value && handleInputChange(value)}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        noOptionsText="Search for a location"
-        onClose={(_e, value) => handleSelectClose(value)}
-        renderInput={(params) => (
-          <TextField {...params} label="Search for an address" variant="outlined" fullWidth />
-        )}
+        onInputChange={(_e, value) => handleInputChange(value)}
         renderOption={(props, option) => (
           <li {...props}>
-            <div>
-              {option.label === currentLocation?.name ? <LocationOnIcon /> : null}
-              <Box
-                component="span"
-                fontWeight={option.label === currentLocation?.name ? '600' : '400'}>
-                {option.label}
-              </Box>
-            </div>
+            <Box className="flex gap-2">
+              {option === CURRENT_LOCATION ? <MyLocationIcon color="primary" /> : null}
+              <Box>{option}</Box>
+            </Box>
           </li>
         )}
-        sx={{ '& fieldset': { borderRadius: '10px' } }}
-      /> */}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            placeholder="Search for a location or address"
+            sx={{ '& fieldset': { borderRadius: 1 } }}
+          />
+        )}
+      />
     </Box>
   );
 }

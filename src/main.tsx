@@ -14,7 +14,7 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: '/:locationLabel/:locationId',
+    path: '/:location',
     element: <App />,
   },
 ]);

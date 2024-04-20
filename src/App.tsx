@@ -38,7 +38,7 @@ function TabPanel(props: Readonly<TabPanelProps>) {
 }
 
 function App() {
-  const { locationLabel, locationId } = useParams();
+  const { location } = useParams();
 
   const [searchCoords, setSearchCoords] = useState<SearchLocation | null>(null);
 
@@ -86,15 +86,16 @@ function App() {
           options.
         </Typography>
       </Box>
-      <Search
-        locationLabel={locationLabel}
-        locationId={locationId}
-        setSearchCoords={setSearchCoords}
-      />
+      <Search location={location} setSearchCoords={setSearchCoords} />
 
       <Tabs value={tab} onChange={(_e, value) => setTab(value)} aria-label="bus and metro tabs">
-        <Tab icon={<DirectionsBusIcon />} label="BUS" />
-        <Tab icon={<TrainIcon />} label="METRO" color="secondary" />
+        <Tab icon={<DirectionsBusIcon />} label="BUS" sx={{ maxWidth: 'none', flex: 1 }} />
+        <Tab
+          icon={<TrainIcon />}
+          label="METRO"
+          color="secondary"
+          sx={{ maxWidth: 'none', flex: 1 }}
+        />
       </Tabs>
 
       <TabPanel value={tab} index={0}>

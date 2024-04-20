@@ -194,7 +194,7 @@ export const getMetroPredictionAtStation = async (
   stationCode: string,
 ): Promise<MetroPrediction[] | null> => {
   try {
-    const url = `${apiUrl}StationPrediction.svc/json/jGetPrediction/${stationCode}`;
+    const url = `${apiUrl}StationPrediction.svc/json/GetPrediction/${stationCode}`;
     const response = await axios.get<MetroPredictionResponse>(url, {
       headers: {
         api_key: apiKey,

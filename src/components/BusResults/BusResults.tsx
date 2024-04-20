@@ -21,13 +21,16 @@ function BusResults({ location, stops }: Readonly<BusResultsProps>) {
   const [busPredictions, setBusPredictions] = useState<Record<string, BusRoutePrediction[]>>({});
   const [expanded, setExpanded] = useState<{ stopId: string; expanded: boolean }[]>([]);
 
+  useEffect(() => {
+    setExpanded(stops.map((stop) => ({ stopId: stop.stopId, expanded: false })));
+  }, [stops]);
+
   const getBusPredictions = async (stopId: string) => {
     setExpanded(
-      expanded.map((e) =>
-        e.stopId === stopId
-          ? { stopId: e.stopId, expanded: !e.expanded }
-          : { stopId: e.stopId, expanded: e.expanded },
-      ),
+      expanded.map((e) => ({
+        stopId: e.stopId,
+        expanded: e.stopId === stopId ? !e.expanded : e.expanded,
+      })),
     );
 
     getBusPredictionAtStop(stopId).then((predictions) => {
@@ -67,19 +70,8 @@ function BusResults({ location, stops }: Readonly<BusResultsProps>) {
     });
   };
 
-  useEffect(() => {
-    const expandedStops: { stopId: string; expanded: boolean }[] = [];
-    stops.forEach((stop) => {
-      expandedStops.push({
-        stopId: stop.stopId,
-        expanded: false,
-      });
-    });
-    setExpanded(expandedStops);
-  }, [stops]);
-
   return (
-    <Box mt={2}>
+    <Box my={2}>
       {location &&
         stops.map((stop) => (
           <Accordion

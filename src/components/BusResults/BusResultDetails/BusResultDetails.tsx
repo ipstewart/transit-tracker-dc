@@ -36,13 +36,14 @@ function BusResultDetails({
   const routeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (route && !routeDetails.hasOwnProperty(route.routeId)) {
+    if (route) {
       getBusPathDetails(route.routeId).then((path) => {
         if (path) {
           setRouteDetails({ ...routeDetails, [route.stopId]: path });
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route]);
 
   useEffect(() => {

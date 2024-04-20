@@ -7,11 +7,13 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 
-import { getBusStops } from './api/api';
+import { getBusStops, getMetroStationEntrances } from './api/api';
 import BusResults from './components/BusResults/BusResults';
+import MetroResults from './components/MetroResults/MetroResults';
 import Search from './components/Search';
 import { BusStop } from './models/bus.model';
 import { SearchLocation } from './models/location.model';
+import { MetroStationEntrance } from './models/metro.model';
 
 // Default location White House if user doesn't enable location
 const DEFAULT_LOCATION = {
@@ -45,6 +47,7 @@ function App() {
   const [location, setLocation] = useState<SearchLocation | null>(DEFAULT_LOCATION);
 
   const [stops, setStops] = useState<BusStop[]>([]);
+  const [metroEntrances, setMetroEntrances] = useState<MetroStationEntrance[]>([]);
 
   const [tab, setTab] = useState(0);
 
@@ -58,8 +61,15 @@ function App() {
           setStops(stops);
         }
       });
+
+      getMetroStationEntrances(location.lat, location.lon, radius).then((metroEntrances) => {
+        if (metroEntrances) {
+          setMetroEntrances(metroEntrances);
+        }
+      });
     } else {
       setStops([]);
+      setMetroEntrances([]);
     }
   }, [location]);
 
@@ -86,6 +96,9 @@ function App() {
 
       <TabPanel value={tab} index={0}>
         <BusResults location={location} stops={stops} />
+      </TabPanel>
+      <TabPanel value={tab} index={1}>
+        <MetroResults location={location} metroEntrances={metroEntrances} />
       </TabPanel>
     </Container>
   );

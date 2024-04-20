@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 
 import { BusStop } from '../../../models/bus.model';
 import { SearchLocation } from '../../../models/location.model';
+import { calculateDistance } from '../../../utils/utils';
 
 interface BusResultSummaryProps {
   location: SearchLocation;
@@ -14,32 +15,6 @@ interface BusResultSummaryProps {
 }
 
 function BusResultSummary({ location, stop, expanded }: Readonly<BusResultSummaryProps>) {
-  const calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number,
-  ): { distance: string; unit: string } => {
-    const R = 6371; // Radius of the Earth in kilometers
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * (Math.PI / 180)) *
-        Math.cos(lat2 * (Math.PI / 180)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c * 0.621371; // Distance in miles
-
-    if (distance < 0.1) {
-      // Convert to feet if the distance is less than 0.1 miles
-      return { distance: (distance * 5280).toFixed(0), unit: 'feet' };
-    } else {
-      return { distance: distance.toFixed(2), unit: 'miles' };
-    }
-  };
-
   return (
     <Box width="100%" display="flex" flexDirection="column" gap={2}>
       <Box display="flex" alignItems="center" gap={1}>
@@ -58,16 +33,15 @@ function BusResultSummary({ location, stop, expanded }: Readonly<BusResultSummar
         alignItems="flex-end"
         color="primary.light">
         <Box>
-          <Typography variant="body1">Routes:</Typography>
-          <Box display="flex" flexWrap="wrap" gap={1}>
+          <Typography variant="body1">Routes</Typography>
+          <Box className="flex flex-wrap" gap={1}>
             {stop.routes
               .filter((route) => !route.includes('*') && !route.includes('/'))
               .map((route) => (
                 <Box
                   key={route}
-                  display="flex"
+                  className="flex items-center"
                   gap="2px"
-                  alignItems="center"
                   border="1px solid #454545"
                   px="3px"
                   py="2px">

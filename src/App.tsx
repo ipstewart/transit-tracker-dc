@@ -6,6 +6,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { getBusStops, getMetroStationEntrances } from './api/api';
 import BusResults from './components/BusResults/BusResults';
@@ -14,13 +15,6 @@ import Search from './components/Search';
 import { BusStop } from './models/bus.model';
 import { SearchLocation } from './models/location.model';
 import { MetroStationEntrance } from './models/metro.model';
-
-// Default location White House if user doesn't enable location
-const DEFAULT_LOCATION = {
-  name: 'The White House, Pennsylvania Avenue Northwest, Washington, DC, USA',
-  lat: 38.897692811818395,
-  lon: -77.03652647629332,
-};
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -44,34 +38,39 @@ function TabPanel(props: Readonly<TabPanelProps>) {
 }
 
 function App() {
-  const [location, setLocation] = useState<SearchLocation | null>(DEFAULT_LOCATION);
+  const { locationLabel, locationId } = useParams();
+
+  const [searchCoords, setSearchCoords] = useState<SearchLocation | null>(null);
 
   const [stops, setStops] = useState<BusStop[]>([]);
   const [metroEntrances, setMetroEntrances] = useState<MetroStationEntrance[]>([]);
 
   const [tab, setTab] = useState(0);
 
-  // .5 miles search radius
-  const radius = 800;
+  // .5 miles bus, 1 mile metro
+  const busRadius = 800;
+  const metroRadius = 1600;
 
   useEffect(() => {
-    if (location) {
-      getBusStops(location.lat, location.lon, radius).then((stops) => {
+    if (searchCoords) {
+      getBusStops(searchCoords.lat, searchCoords.lon, busRadius).then((stops) => {
         if (stops) {
           setStops(stops);
         }
       });
 
-      getMetroStationEntrances(location.lat, location.lon, radius).then((metroEntrances) => {
-        if (metroEntrances) {
-          setMetroEntrances(metroEntrances);
-        }
-      });
+      getMetroStationEntrances(searchCoords.lat, searchCoords.lon, metroRadius).then(
+        (metroEntrances) => {
+          if (metroEntrances) {
+            setMetroEntrances(metroEntrances);
+          }
+        },
+      );
     } else {
       setStops([]);
       setMetroEntrances([]);
     }
-  }, [location]);
+  }, [searchCoords]);
 
   return (
     <Container maxWidth="md">
@@ -87,7 +86,11 @@ function App() {
           options.
         </Typography>
       </Box>
-      <Search location={location} setLocation={setLocation} />
+      <Search
+        locationLabel={locationLabel}
+        locationId={locationId}
+        setSearchCoords={setSearchCoords}
+      />
 
       <Tabs value={tab} onChange={(_e, value) => setTab(value)} aria-label="bus and metro tabs">
         <Tab icon={<DirectionsBusIcon />} label="BUS" />
@@ -95,10 +98,10 @@ function App() {
       </Tabs>
 
       <TabPanel value={tab} index={0}>
-        <BusResults location={location} stops={stops} />
+        <BusResults location={searchCoords} stops={stops} />
       </TabPanel>
       <TabPanel value={tab} index={1}>
-        <MetroResults location={location} metroEntrances={metroEntrances} />
+        <MetroResults location={searchCoords} metroEntrances={metroEntrances} />
       </TabPanel>
     </Container>
   );

@@ -1,10 +1,11 @@
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import TrainIcon from '@mui/icons-material/Train';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import IconButton from '@mui/material/IconButton';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
-import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -74,17 +75,11 @@ function App() {
 
   return (
     <Container maxWidth="md">
-      <Box p={2} pt={4}>
-        <Typography variant="h4" fontWeight="400">
-          Where To{' '}
-          <Typography component="span" variant="h4" fontWeight="700" color="primary">
-            DMV
-          </Typography>
-        </Typography>
-        <Typography variant="body1">
-          Input an address to discover the best real-time Washington, DC public transportation
-          options.
-        </Typography>
+      <Box className="flex items-center justify-between pt-4 gap-2">
+        <Box component="img" src="./logo.svg" height="70px" />
+        <IconButton aria-label="info" color="primary" size="medium">
+          <QuestionMarkIcon fontSize="inherit" />
+        </IconButton>
       </Box>
       <Search location={location} setSearchCoords={setSearchCoords} />
 

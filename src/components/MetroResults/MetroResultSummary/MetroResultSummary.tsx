@@ -28,7 +28,7 @@ function MetroResultSummary({
 
   return (
     <Box className="flex flex-col w-full gap-2">
-      <Box className="flex items-center gap-1">
+      <Box className="flex items-center gap-2">
         <ArrowForwardIosIcon
           fontSize="small"
           sx={{ transform: expanded ? 'rotate(90deg)' : null, transition: 'transform 0.1s' }}

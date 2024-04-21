@@ -40,7 +40,7 @@ const darkTheme = responsiveFontSizes(
         main: '#f48fb1',
       },
       info: {
-        main: '#B2DE69',
+        main: '#81C784',
       },
       background: {
         default: '#303030',

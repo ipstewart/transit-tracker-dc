@@ -98,7 +98,8 @@ function Search({ location, setSearchCoords }: Readonly<SearchProps>) {
     } else {
       searchAddress(location);
     }
-  }, [location, currentLocation, navigate, setSearchCoords]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLocation, setSearchCoords]);
 
   const handleInputChange = (searchAddress: string) => {
     if (searchAddress === CURRENT_LOCATION) {
@@ -127,9 +128,7 @@ function Search({ location, setSearchCoords }: Readonly<SearchProps>) {
       setAddressOptions(currentLocation ? [CURRENT_LOCATION] : []);
       setSelectedLocation(null);
       navigate('/');
-      return;
-    }
-    if (selection === CURRENT_LOCATION && currentLocation) {
+    } else if (selection === CURRENT_LOCATION && currentLocation) {
       setSearchCoords(currentLocation);
       setSelectedLocation(selection);
       navigate(`/${encodeURIComponent(selection)}`);

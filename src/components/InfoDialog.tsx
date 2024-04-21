@@ -34,8 +34,15 @@ function InfoDialog({ open, onClose }: Readonly<InfoDialogProps>) {
           Metro Tab
         </Typography>
         <Typography variant="body1" mb={2}>
-          Find metro stations within a .5-mile radius and click on them to see real-time schedules
-          for each metro line.
+          Find nearby metro stations and click on them to see real-time schedules for each metro
+          line.
+        </Typography>
+
+        <Typography variant="body1" fontWeight="700">
+          Map Tab
+        </Typography>
+        <Typography variant="body1" mb={2}>
+          See a map of nearby bus stops and metro stations and click on them to get more information.
         </Typography>
 
         <Typography variant="body1">

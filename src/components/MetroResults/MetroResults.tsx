@@ -28,8 +28,11 @@ function MetroResults({ location, metroEntrances }: Readonly<MetroResultsProps>)
         metroEntrances.map((entrance) => [entrance.stationCode1, entrance.stationCode2]).flat(),
       ),
     ];
+
+    // Only take the first 5 stations if large list, to avoid the TooManyRequests WMATA API error
     const metroStations = uniqueStationCodes
       .filter((code) => code)
+      .slice(0, Math.min(5, uniqueStationCodes.length))
       .map((code) => getMetroStation(code));
 
     Promise.all(metroStations).then((stations) => {

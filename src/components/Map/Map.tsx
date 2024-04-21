@@ -14,6 +14,12 @@ import BusResultSummary from '../BusResults/BusResultSummary/BusResultSummary';
 import MetroResultSummary from '../MetroResults/MetroResultSummary/MetroResultSummary';
 import './map.css';
 
+const locationIcon = new L.Icon({
+  iconUrl: './icons/location.svg',
+  iconSize: [25, 25],
+  iconAnchor: [16, 32],
+});
+
 const metroIcon = new L.Icon({
   iconUrl: './icons/metro-icon.svg',
   iconSize: [25, 25],
@@ -52,8 +58,11 @@ function MetroMap({ location, busStops, metroEntrances }: Readonly<MetroMapProps
         metroEntrances.map((entrance) => [entrance.stationCode1, entrance.stationCode2]).flat(),
       ),
     ];
+
+    // Only take the first 5 stations if large list, to avoid the TooManyRequests WMATA API error
     const metroStations = uniqueStationCodes
       .filter((code) => code)
+      .slice(0, Math.min(5, uniqueStationCodes.length))
       .map((code) => getMetroStation(code));
 
     Promise.all(metroStations).then((stations) => {
@@ -74,6 +83,7 @@ function MetroMap({ location, busStops, metroEntrances }: Readonly<MetroMapProps
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        {location && <Marker position={[location.lat, location.lon]} icon={locationIcon} />}
         {metroStations.map((station) => (
           <Marker key={station.code} position={[station.lat, station.lon]} icon={metroIcon}>
             <Popup>

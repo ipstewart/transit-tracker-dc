@@ -12,7 +12,8 @@ interface MetroResultSummaryProps {
   location: SearchLocation;
   station: MetroStation;
   station2: MetroStation | null;
-  expanded: boolean | undefined;
+  expanded?: boolean;
+  showExpandedIcon?: boolean;
 }
 
 function MetroResultSummary({
@@ -20,6 +21,7 @@ function MetroResultSummary({
   station,
   station2,
   expanded,
+  showExpandedIcon = true,
 }: Readonly<MetroResultSummaryProps>) {
   const stationLines = [station.lineCode1, station.lineCode2, station.lineCode3, station.lineCode4];
   const station2Lines = station2
@@ -29,18 +31,24 @@ function MetroResultSummary({
   return (
     <Box className="flex flex-col w-full gap-2">
       <Box className="flex items-center gap-2">
-        <ArrowForwardIosIcon
-          fontSize="small"
-          sx={{ transform: expanded ? 'rotate(90deg)' : null, transition: 'transform 0.1s' }}
-        />
+        {showExpandedIcon && (
+          <ArrowForwardIosIcon
+            fontSize="small"
+            sx={{ transform: expanded ? 'rotate(90deg)' : null, transition: 'transform 0.1s' }}
+          />
+        )}
         <Box bgcolor="primary.main" borderRadius="30px" p="5px">
           <TrainIcon sx={{ color: 'primary.contrastText' }} />
         </Box>
-        <Typography variant="h5">{station.name}</Typography>
+        <Typography variant="h5" color="text.primary">
+          {station.name}
+        </Typography>
       </Box>
       <Box className="flex justify-between items-end">
         <Box>
-          <Typography variant="body1">Lines</Typography>
+          <Typography variant="body1" color="text.primary">
+            Lines
+          </Typography>
           <Box className="flex flex-wrap gap-1">
             {stationLines
               .concat(station2Lines)
@@ -62,8 +70,8 @@ function MetroResultSummary({
           </Box>
         </Box>
         <Box className="flex gap-1">
-          <DirectionsWalkIcon fontSize="small" />
-          <Typography variant="body1" whiteSpace="nowrap">
+          <DirectionsWalkIcon fontSize="small" sx={{ color: 'text.primary' }} />
+          <Typography variant="body1" whiteSpace="nowrap" color="text.primary">
             {calculateDistance(location.lat, location.lon, station.lat, station.lon).distance}{' '}
             {calculateDistance(location.lat, location.lon, station.lat, station.lon).unit}
           </Typography>

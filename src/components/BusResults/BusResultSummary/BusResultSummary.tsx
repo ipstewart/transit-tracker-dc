@@ -11,25 +11,37 @@ import { calculateDistance } from '../../../utils/utils';
 interface BusResultSummaryProps {
   location: SearchLocation;
   stop: BusStop;
-  expanded: boolean | undefined;
+  expanded?: boolean;
+  showExpandedIcon?: boolean;
 }
 
-function BusResultSummary({ location, stop, expanded }: Readonly<BusResultSummaryProps>) {
+function BusResultSummary({
+  location,
+  stop,
+  expanded,
+  showExpandedIcon = true,
+}: Readonly<BusResultSummaryProps>) {
   return (
     <Box className="w-full flex flex-col gap-3">
       <Box className="flex items-center gap-2">
-        <ArrowForwardIosIcon
-          fontSize="small"
-          sx={{ transform: expanded ? 'rotate(90deg)' : null, transition: 'transform 0.1s' }}
-        />
+        {showExpandedIcon && (
+          <ArrowForwardIosIcon
+            fontSize="small"
+            sx={{ transform: expanded ? 'rotate(90deg)' : null, transition: 'transform 0.1s' }}
+          />
+        )}
         <Box bgcolor="primary.main" borderRadius="30px" p="5px">
           <DirectionsBusIcon sx={{ color: 'primary.contrastText' }} />
         </Box>
-        <Typography variant="h5">{stop.name}</Typography>
+        <Typography variant="h5" color="text.primary">
+          {stop.name}
+        </Typography>
       </Box>
       <Box className="flex justify-between items-end">
         <Box>
-          <Typography variant="body1">Routes</Typography>
+          <Typography variant="body1" color="text.primary">
+            Routes
+          </Typography>
           <Box className="flex flex-wrap gap-2">
             {stop.routes
               .filter((route) => !route.includes('*') && !route.includes('/'))
@@ -39,8 +51,8 @@ function BusResultSummary({ location, stop, expanded }: Readonly<BusResultSummar
                   className="flex items-center gap-[2px] px-[3px] py-[2px]"
                   border="1px solid #454545"
                   borderColor="text.primary">
-                  <DirectionsBusIcon sx={{ fontSize: '14px' }} />
-                  <Typography variant="body2" lineHeight="14px">
+                  <DirectionsBusIcon sx={{ fontSize: '14px', color: 'text.primary' }} />
+                  <Typography variant="body2" lineHeight="14px" color="text.primary">
                     {route}
                   </Typography>
                 </Box>
@@ -48,8 +60,8 @@ function BusResultSummary({ location, stop, expanded }: Readonly<BusResultSummar
           </Box>
         </Box>
         <Box className="flex gap-2">
-          <DirectionsWalkIcon fontSize="small" />
-          <Typography variant="body1" whiteSpace="nowrap">
+          <DirectionsWalkIcon fontSize="small" sx={{ color: 'text.primary' }} />
+          <Typography variant="body1" whiteSpace="nowrap" color="text.primary">
             {calculateDistance(location.lat, location.lon, stop.lat, stop.lon).distance}{' '}
             {calculateDistance(location.lat, location.lon, stop.lat, stop.lon).unit}
           </Typography>

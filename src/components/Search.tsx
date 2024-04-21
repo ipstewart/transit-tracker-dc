@@ -160,9 +160,11 @@ function Search({ location, setSearchCoords }: Readonly<SearchProps>) {
         onInputChange={(_e, value) => handleInputChange(value)}
         renderOption={(props, option) => (
           <li {...props}>
-            <Box className="flex gap-2">
+            <Box className="flex gap-2 w-full">
               {option === CURRENT_LOCATION ? <MyLocationIcon color="primary" /> : null}
-              <Box>{option}</Box>
+              <Box className="max-w-full overflow-hidden whitespace-nowrap text-ellipsis">
+                {option}
+              </Box>
             </Box>
           </li>
         )}

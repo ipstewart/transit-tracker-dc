@@ -42,7 +42,8 @@ function InfoDialog({ open, onClose }: Readonly<InfoDialogProps>) {
           Map Tab
         </Typography>
         <Typography variant="body1" mb={2}>
-          See a map of nearby bus stops and metro stations and click on them to get more information.
+          See a map of nearby bus stops and metro stations and click on them to get more
+          information.
         </Typography>
 
         <Typography variant="body1">

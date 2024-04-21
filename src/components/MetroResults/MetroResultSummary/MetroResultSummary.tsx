@@ -8,7 +8,7 @@ import { SearchLocation } from '../../../models/location.model';
 import { MetroStation } from '../../../models/metro.model';
 import { calculateDistance, getMetroColor } from '../../../utils/utils';
 
-interface MetroResultSummaryInterface {
+interface MetroResultSummaryProps {
   location: SearchLocation;
   station: MetroStation;
   station2: MetroStation | null;
@@ -20,7 +20,7 @@ function MetroResultSummary({
   station,
   station2,
   expanded,
-}: Readonly<MetroResultSummaryInterface>) {
+}: Readonly<MetroResultSummaryProps>) {
   const stationLines = [station.lineCode1, station.lineCode2, station.lineCode3, station.lineCode4];
   const station2Lines = station2
     ? [station2?.lineCode1, station2?.lineCode2, station2?.lineCode3, station2?.lineCode4]
@@ -38,7 +38,7 @@ function MetroResultSummary({
         </Box>
         <Typography variant="h5">{station.name}</Typography>
       </Box>
-      <Box className="flex justify-between items-end" color="primary.light">
+      <Box className="flex justify-between items-end">
         <Box>
           <Typography variant="body1">Lines</Typography>
           <Box className="flex flex-wrap gap-1">

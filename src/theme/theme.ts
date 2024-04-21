@@ -1,12 +1,15 @@
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
-export const theme = responsiveFontSizes(
+const typography = {
+  fontFamily: "'Source Sans 3 Variable'",
+  h5: {
+    fontWeight: 500,
+  },
+};
+
+const lightTheme = responsiveFontSizes(
   createTheme({
     palette: {
-      background: {
-        default: '#FAF9F6',
-        paper: '#FFF',
-      },
       primary: {
         light: '#454545',
         main: '#002F6C',
@@ -17,12 +20,35 @@ export const theme = responsiveFontSizes(
       info: {
         main: '#33A532',
       },
-    },
-    typography: {
-      fontFamily: "'Source Sans 3 Variable'",
-      h5: {
-        fontWeight: 500,
+      background: {
+        default: '#FAF9F6',
+        paper: '#FFF',
       },
     },
+    typography,
   }),
 );
+
+const darkTheme = responsiveFontSizes(
+  createTheme({
+    palette: {
+      mode: 'dark',
+      primary: {
+        main: '#81CCE8',
+      },
+      secondary: {
+        main: '#f48fb1',
+      },
+      info: {
+        main: '#B2DE69',
+      },
+      background: {
+        default: '#303030',
+        paper: '#424242',
+      },
+    },
+    typography,
+  }),
+);
+
+export { lightTheme, darkTheme };

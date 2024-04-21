@@ -12,12 +12,12 @@ import { MetroPrediction, MetroStation, MetroStationEntrance } from '../../model
 import MetroResultDetails from './MetroResultDetails/MetroResultDetails';
 import MetroResultSummary from './MetroResultSummary/MetroResultSummary';
 
-interface MetroResultsInterface {
+interface MetroResultsProps {
   location: SearchLocation | null;
   metroEntrances: MetroStationEntrance[];
 }
 
-function MetroResults({ location, metroEntrances }: Readonly<MetroResultsInterface>) {
+function MetroResults({ location, metroEntrances }: Readonly<MetroResultsProps>) {
   const [metroStations, setMetroStations] = useState<MetroStation[]>([]);
   const [metroPredictions, setMetroPredictions] = useState<Record<string, MetroPrediction[]>>({});
   const [expanded, setExpanded] = useState<{ stationCode: string; expanded: boolean }[]>([]);
@@ -81,7 +81,7 @@ function MetroResults({ location, metroEntrances }: Readonly<MetroResultsInterfa
             <Accordion
               key={station.code}
               disableGutters
-              sx={{ my: 3, color: 'primary.light' }}
+              sx={{ my: 3 }}
               elevation={2}
               onChange={() => getMetroPredictions([station.code, station.stationTogether1])}>
               <AccordionSummary sx={{ py: 2, px: 3 }}>

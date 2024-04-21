@@ -3,7 +3,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import moment, { Moment } from 'moment';
+import { Moment } from 'moment';
 
 import { MetroPrediction } from '../../../models/metro.model';
 import { getMetroColor } from '../../../utils/utils';
@@ -29,7 +29,7 @@ function MetroResultDetails({
           color="info.contrastText"
           bgcolor="info.main"
           lineHeight="14px"
-          p="2px">
+          p="3px">
           LIVE {lastUpdated.format('hh:mm:ss')}
         </Typography>
         <IconButton
@@ -93,8 +93,7 @@ function MetroResultDetails({
               <Typography variant="body1">
                 {['BRD', 'ARR'].includes(prediction.min)
                   ? prediction.min
-                  : `${prediction.min} minutes`}{' '}
-                | {moment().add(Number(prediction.min), 'minutes').format('h:mm A')}
+                  : `${prediction.min} minutes`}
               </Typography>
             </Box>
           </Box>

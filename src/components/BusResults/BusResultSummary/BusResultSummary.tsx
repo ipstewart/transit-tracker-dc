@@ -16,8 +16,8 @@ interface BusResultSummaryProps {
 
 function BusResultSummary({ location, stop, expanded }: Readonly<BusResultSummaryProps>) {
   return (
-    <Box width="100%" display="flex" flexDirection="column" gap={2}>
-      <Box display="flex" alignItems="center" gap={1}>
+    <Box className="w-full flex flex-col gap-3">
+      <Box className="flex items-center gap-2">
         <ArrowForwardIosIcon
           fontSize="small"
           sx={{ transform: expanded ? 'rotate(90deg)' : null, transition: 'transform 0.1s' }}
@@ -27,24 +27,18 @@ function BusResultSummary({ location, stop, expanded }: Readonly<BusResultSummar
         </Box>
         <Typography variant="h5">{stop.name}</Typography>
       </Box>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="flex-end"
-        color="primary.light">
+      <Box className="flex justify-between items-end">
         <Box>
           <Typography variant="body1">Routes</Typography>
-          <Box className="flex flex-wrap" gap={1}>
+          <Box className="flex flex-wrap gap-2">
             {stop.routes
               .filter((route) => !route.includes('*') && !route.includes('/'))
               .map((route) => (
                 <Box
                   key={route}
-                  className="flex items-center"
-                  gap="2px"
+                  className="flex items-center gap-[2px] px-[3px] py-[2px]"
                   border="1px solid #454545"
-                  px="3px"
-                  py="2px">
+                  borderColor="text.primary">
                   <DirectionsBusIcon sx={{ fontSize: '14px' }} />
                   <Typography variant="body2" lineHeight="14px">
                     {route}
@@ -53,7 +47,7 @@ function BusResultSummary({ location, stop, expanded }: Readonly<BusResultSummar
               ))}
           </Box>
         </Box>
-        <Box display="flex" gap={1}>
+        <Box className="flex gap-2">
           <DirectionsWalkIcon fontSize="small" />
           <Typography variant="body1" whiteSpace="nowrap">
             {calculateDistance(location.lat, location.lon, stop.lat, stop.lon).distance}{' '}

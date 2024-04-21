@@ -77,7 +77,7 @@ function BusResults({ location, stops }: Readonly<BusResultsProps>) {
           <Accordion
             key={stop.stopId}
             disableGutters
-            sx={{ my: 3, color: 'primary.light' }}
+            sx={{ my: 3 }}
             elevation={2}
             onChange={() => getBusPredictions(stop.stopId)}>
             <AccordionSummary sx={{ py: 2, px: 3 }}>

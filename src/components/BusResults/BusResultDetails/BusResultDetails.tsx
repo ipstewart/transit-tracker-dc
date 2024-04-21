@@ -56,10 +56,10 @@ function BusResultDetails({
     const displayRouteDetails = routeDetails[stopId];
 
     const routeTemplate = (stopId: string, name: string) => (
-      <Box key={stopId} className="flex items-center" gap={1}>
-        <Box className="h-[2px] w-[10px]" bgcolor="primary.main" />
+      <Box key={stopId} className="flex items-center gap-2">
+        <Box className="h-[2px] w-[10px]" bgcolor="text.primary" />
         <Typography
-          variant="h6"
+          variant="body1"
           fontWeight={stopId === stop.stopId ? 600 : 300}
           whiteSpace="nowrap"
           overflow="hidden"
@@ -101,16 +101,16 @@ function BusResultDetails({
           {busPredictions.map((busRoute, index) => (
             <Box
               key={stop.stopId + busRoute.routeId}
-              display="flex"
-              flexDirection="column"
-              gap={1}
+              className="flex flex-col gap-2"
               mb={index < busPredictions.length - 1 ? 3 : 0}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
-                <Box display="flex" alignItems="center" flexWrap="wrap" gap={1} minWidth={0}>
+              <Box className="flex justify-between items-center gap-3">
+                <Box className="flex items-center flex-wrap gap-2 min-w-0">
                   <Box
                     className="flex gap-[2px] items-center px-[3px] py-[2px]"
-                    border="1px solid #454545"
-                    borderLeft="3px solid #002F6C">
+                    border="1px solid"
+                    borderLeft="3px solid"
+                    borderColor="text.primary"
+                    sx={{ borderLeftColor: 'primary.main' }}>
                     <DirectionsBusIcon sx={{ fontSize: '14px' }} />
                     <Typography variant="body2" lineHeight="14px">
                       {busRoute.routeId}
@@ -128,7 +128,7 @@ function BusResultDetails({
                     color="info.contrastText"
                     bgcolor="info.main"
                     lineHeight="14px"
-                    p="2px">
+                    p="3px">
                     LIVE {busRoute.lastUpdated.format('hh:mm:ss')}
                   </Typography>
                   <IconButton
@@ -142,7 +142,6 @@ function BusResultDetails({
                 {!route && (
                   <Button
                     endIcon={<ArrowForwardIosIcon />}
-                    sx={{ color: 'primary.light' }}
                     onClick={() =>
                       setRoute({
                         stopId: stop.stopId,
@@ -155,10 +154,10 @@ function BusResultDetails({
                   </Button>
                 )}
               </Box>
-              <Box className="w-[200px] h-[1px]" bgcolor="primary.light" />
+              <Box className="w-[200px] h-[1px]" bgcolor="text.primary" />
               <Box className="w-[200px] max-w-full">
                 {busRoute.predictions.map((prediction) => (
-                  <Box key={prediction.tripId} display="flex" justifyContent="space-between">
+                  <Box key={prediction.tripId} className="flex justify-between">
                     <Typography variant="body1">
                       {prediction.minutes === 0 ? 'ARRIVING' : `${prediction.minutes} minutes`}
                     </Typography>
@@ -176,13 +175,15 @@ function BusResultDetails({
         className={`w-full absolute top-0 ${route ? 'left-0' : 'left-full'}`}
         sx={{ transition: 'left 0.3s' }}
         ref={routeRef}>
-        <Box className="w-full flex flex-col" gap={1}>
-          <Box className="flex justify-between" gap={1}>
-            <Box className="flex items-center min-w-0" gap={1}>
+        <Box className="w-full flex flex-col gap-2">
+          <Box className="flex justify-between gap-2">
+            <Box className="flex items-center min-w-0 gap-2">
               <Box
                 className="flex gap-[2px] items-center px-[3px] py-[2px]"
-                border="1px solid #454545"
-                borderLeft="3px solid #002F6C">
+                border="1px solid"
+                borderLeft="3px solid"
+                borderColor="text.primary"
+                sx={{ borderLeftColor: 'primary.main' }}>
                 <DirectionsBusIcon sx={{ fontSize: '14px' }} />
                 <Typography variant="body2" lineHeight="14px">
                   {route?.routeId}
@@ -196,19 +197,15 @@ function BusResultDetails({
                 {route?.routeName}
               </Typography>
             </Box>
-            <Button
-              startIcon={<ArrowBackIosIcon />}
-              sx={{ color: 'primary.light' }}
-              onClick={() => setRoute(null)}>
+            <Button startIcon={<ArrowBackIosIcon />} onClick={() => setRoute(null)}>
               SCHEDULE
             </Button>
           </Box>
-          <Box className="w-[200px] h-[1px]" bgcolor="primary.light" />
+          <Box className="w-[200px] h-[1px]" bgcolor="text.primary" />
           <Box
-            className="flex items-center"
-            gap={2}
+            className="flex items-center gap-3"
             borderLeft="2px solid"
-            borderColor="primary.main">
+            borderColor="text.primary">
             <Box className="w-full">{renderRoute(stop.stopId)}</Box>
           </Box>
         </Box>

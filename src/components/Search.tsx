@@ -107,7 +107,7 @@ function Search({ location, setSearchCoords }: Readonly<SearchProps>) {
       return;
     }
     if (!searchAddress) {
-      setAddressOptions([CURRENT_LOCATION]);
+      setAddressOptions(currentLocation ? [CURRENT_LOCATION] : []);
       return;
     }
     autocomplete.current?.getPlacePredictions({ input: searchAddress }, (predictions, status) => {

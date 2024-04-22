@@ -18,7 +18,7 @@ function InfoDialog({ open, onClose }: Readonly<InfoDialogProps>) {
         <Typography variant="body1" mb={2}>
           Transit Tracker DC helps you navigate the Washington Metropolitan Area Transit Authority
           (WMATA) system with real-time bus and metro schedule updates. Enter an address or use your
-          current location to find nearby transit options, then use our two tabs to get the info you
+          current location to find nearby transit options, then use our three tabs to get the info you
           need.
         </Typography>
 

@@ -1,36 +1,30 @@
-# React + TypeScript + Vite
+# Transit Tracker DC
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Code for [transittrackerdc.com](transittrackerdc.com).
 
-Currently, two official plugins are available:
+Transit Tracker DC helps you navigate the Washington Metropolitan Area Transit Authority (WMATA)
+system with real-time bus and metro schedule updates. Enter an address or use your current location
+to find nearby transit options, then use our three tabs to get the info you need.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md)
-  uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses
-  [SWC](https://swc.rs/) for Fast Refresh
+Built in React with Vite and using the WMATA API.
 
-## Expanding the ESLint configuration
+To run, you'll need to add keys for the [WMATA API](https://developer.wmata.com/) and
+[Google Maps API](https://developers.google.com/maps) to your `.env` file.
 
-If you are developing a production application, we recommend updating the configuration to enable
-type aware lint rules:
+Install the dependencies:
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-};
+```zsh
+npm i
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to
-  `plugin:@typescript-eslint/recommended-type-checked` or
-  `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add
-  `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Run the application:
+
+```zsh
+npm run dev
+```
+
+Run the auto-formatter and lint-checker:
+
+```zsh
+npm run check
+```

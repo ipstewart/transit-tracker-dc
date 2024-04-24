@@ -1,4 +1,5 @@
 import '@fontsource-variable/source-sans-3';
+import { Analytics } from '@vercel/analytics/react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   // <React.StrictMode>
   <ThemeProviderWrapper>
+    <Analytics />
     <RouterProvider router={router} />
   </ThemeProviderWrapper>,
   // </React.StrictMode>,
